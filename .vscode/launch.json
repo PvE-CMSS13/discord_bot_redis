@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug 'redis_bot'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=redis_bot",
+                    "--package=redis_bot"
+                ],
+                "filter": {
+                    "name": "redis_bot",
+                    "kind": "bin"
+                }
+            },
+            "envFile": "${workspaceFolder}/.env",
+            "args": [],
+        },
+    ]
+}

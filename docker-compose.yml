@@ -1,0 +1,24 @@
+
+#TODO: test live, readmes
+
+services:
+  main_bot:
+    build:
+      context: /main_bot
+    env_file:
+      - path: /main_bot/.env
+    networks:
+      - pvecm13-tgs
+      
+  redis_bot:
+    build:
+      context: /redis_bot
+    env_file:
+      - path: /redis_bot/.env
+    networks:
+      - pvecm13-tgs
+
+networks:
+  pvecm13-tgs:
+    external:
+      true

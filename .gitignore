@@ -1,0 +1,8 @@
+**/target
+**/bin
+**/.env
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+**/secrets.dev.yaml
+**/values.dev.yaml
