@@ -189,7 +189,7 @@ struct AsaySubscription {
     author: String,
     message: String,
     #[serde(default)]
-    admin: bool,
+    admin: u8,
     rank: String,
 }
 
