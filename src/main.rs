@@ -37,7 +37,7 @@ async fn main() {
     match dotenv() {
         Ok(_) => {}
         Err(_error) => {
-            println!("No local .env found. This is normal if running in docker or debugging via VSC. Continuing.");
+            println!("No local .env found. This is normal if running in docker. Continuing.");
         }
     }
 
