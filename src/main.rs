@@ -1,6 +1,8 @@
 use dotenvy::dotenv;
 
-use serenity::all::{Colour, CreateEmbed, CreateEmbedFooter, CreateMessage, Timestamp};
+use serenity::all::{
+    Color, CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, CreateMessage, Timestamp,
+};
 use tokio::try_join;
 
 use futures_util::StreamExt;
@@ -209,29 +211,128 @@ fn handle_asay_subscription(payload: String) -> Option<CreateMessage> {
 
     let message = CreateMessage::new().embed(
         CreateEmbed::new()
-            .title(deserialized_payload.author)
+            .author(CreateEmbedAuthor::new(deserialized_payload.author))
             .description(deserialized_payload.message)
             .footer(CreateEmbedFooter::new(format!(
                 "{}@{}",
                 deserialized_payload.rank, deserialized_payload.source
             )))
             .timestamp(Timestamp::now())
-            .color(Colour::from_rgb(124, 68, 12)),
+            .color(Color::BLUE),
     );
 
     return Some(message);
 }
-//TODO: Implement access
-fn handle_access_subscription(payload: String) -> Option<CreateMessage> {
-    None
+
+#[derive(Serialize, Deserialize, Debug)]
+struct AccessSubscription {
+    source: String,
+    round_id: String,
+    event_type: String,
+    key: String,
+    remaining: u64,
+    afk: u64,
 }
-//TODO: Implement access
+
+const LOGIN: &str = "login";
+const LOGOUT: &str = "logout";
+
+//TODO: Test live, make sure to TM variable name change from type to event_type
+fn handle_access_subscription(payload: String) -> Option<CreateMessage> {
+    let deserialized_payload: AccessSubscription = match serde_json::from_str(&payload) {
+        Ok(deserialized) => deserialized,
+        Err(error) => {
+            println!("Unable to deserialize from String to AccessSubscription. Error: {error:?}");
+            return None;
+        }
+    };
+
+    let (description, color) = match deserialized_payload.event_type.as_str() {
+        LOGIN => (
+            format!(
+                "Logged in. {} volunteers now online.",
+                deserialized_payload.remaining
+            ),
+            Color::DARK_GREEN,
+        ),
+        LOGOUT => (
+            format!(
+                "Logged out. {} volunteers now online.",
+                deserialized_payload.remaining
+            ),
+            Color::RED,
+        ),
+        _ => {
+            return None;
+        }
+    };
+
+    let message = CreateMessage::new().embed(
+        CreateEmbed::new()
+            .author(CreateEmbedAuthor::new(deserialized_payload.key))
+            .description(description)
+            .footer(CreateEmbedFooter::new(format!(
+                "@{}",
+                deserialized_payload.source
+            )))
+            .timestamp(Timestamp::now())
+            .color(color),
+    );
+
+    return Some(message);
+}
+
+//TODO: Implement round
 fn handle_round_subscription(payload: String) -> Option<CreateMessage> {
     None
 }
-//TODO: Implement access
+
+#[derive(Serialize, Deserialize, Debug)]
+struct MetaSubscription {
+    source: String,
+    event_type: String,
+    #[serde(default)]
+    reason: String,
+}
+
+const CONNECT: &str = "connect";
+const DISCONNECT: &str = "disconnect";
+
+//TODO: Test live, make sure to TM variable name change from type to event_type
 fn handle_meta_subscription(payload: String) -> Option<CreateMessage> {
-    None
+    let deserialized_payload: MetaSubscription = match serde_json::from_str(&payload) {
+        Ok(deserialized) => deserialized,
+        Err(error) => {
+            println!("Unable to deserialize from String to AccessSubscription. Error: {error:?}");
+            return None;
+        }
+    };
+
+    let description = match deserialized_payload.event_type.as_str() {
+        CONNECT => {
+            format!("Instance connected.")
+        }
+        DISCONNECT => {
+            format!("Instance Disconnected - {}", deserialized_payload.reason)
+        }
+        _ => {
+            return None;
+        }
+    };
+
+    let message = CreateMessage::new().embed(
+        CreateEmbed::new()
+            .author(CreateEmbedAuthor::new("Redis Connection"))
+            .description(description)
+            .footer(CreateEmbedFooter::new(format!(
+                "@{}",
+                deserialized_payload.source
+            )))
+            .timestamp(Timestamp::now())
+            .color(Color::GOLD),
+    );
+
+    return Some(message);
 }
 
 //TODO: Redis publish discord -> server messages
