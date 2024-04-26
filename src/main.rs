@@ -184,10 +184,12 @@ async fn setup_subscriptions(
 #[derive(Serialize, Deserialize, Debug)]
 struct AsaySubscription {
     source: String,
+    #[serde(default)]
     round_id: String,
     author: String,
     message: String,
-    admin: String,
+    #[serde(default)]
+    admin: bool,
     rank: String,
 }
 
@@ -199,6 +201,11 @@ fn handle_asay_subscription(payload: String) -> Option<CreateMessage> {
             return None;
         }
     };
+
+    //TODO: Convert this to const when we publish on this channel later
+    if deserialized_payload.source == "discord" {
+        return None;
+    }
 
     let message = CreateMessage::new().embed(
         CreateEmbed::new()
@@ -227,4 +234,4 @@ fn handle_meta_subscription(payload: String) -> Option<CreateMessage> {
     None
 }
 
-//TODO: HTTP send to server from discord -> server responses.
+//TODO: Redis publish discord -> server messages
