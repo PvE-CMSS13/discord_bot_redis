@@ -10,7 +10,7 @@ COPY Cargo.toml /app
 RUN apk add --no-cache clang lld musl-dev git
 RUN cargo install cargo-chef
 RUN cargo chef prepare --recipe-path recipe.json
-RUN cargo chef cook -release --recipe-path recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
 RUN cargo build --release && \
     cp ./target/release/$APP_NAME /bin/$APP_NAME
 
