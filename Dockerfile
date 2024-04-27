@@ -14,4 +14,4 @@ RUN cargo chef cook --release --recipe-path recipe.json
 RUN cargo build --release && \
     cp ./target/release/$APP_NAME /bin/$APP_NAME
 
-CMD ["/bin/${APP_NAME}"]
+CMD ["sh", "-c", "/bin/${APP_NAME}"]
