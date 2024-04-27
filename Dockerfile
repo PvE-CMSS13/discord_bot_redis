@@ -16,7 +16,7 @@ FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
-RUN cargo build --release --bin app
+RUN cargo build --release --bin redis_bot
 
 FROM rust:${RUST_VERSION}-alpine AS runtime
 WORKDIR /app
